@@ -296,6 +296,10 @@ abstract class backup_cron_automated_helper {
 
                     // Only make the backup if laststatus isn't 2-UNFINISHED (uncontrolled error or being backed up).
                     if ($backupcourse->laststatus != self::BACKUP_STATUS_UNFINISHED) {
+                        // Set the number of tries before adding to queue
+                        $backupcourse->tries = $backupcourse->tries + 1;
+                        $DB->update_record('backup_courses', $backupcourse);
+
                         // Add every non-skipped courses to backup adhoc task queue.
                         mtrace('Putting backup of ' . $course->fullname . ' in adhoc task queue ...');
 
@@ -338,6 +342,12 @@ abstract class backup_cron_automated_helper {
         if ($config->backup_auto_skip_hidden) {
             $skipped = ($config->backup_auto_skip_hidden && !$course->visible);
             $skippedmessage = 'Not visible';
+        }
+
+        // Skip on too many retries
+        if (!$skipped && $config->backup_auto_skip_too_many_fails > 0) {
+            $skipped = $backupcourse->tries > $config->backup_auto_skip_too_many_fails;
+            $skippedmessage = "Too many failed attempts";
         }
 
         // If config backup_auto_skip_modif_days is set to true, skip courses

@@ -209,6 +209,67 @@ class core_backup_automated_backup_testcase extends advanced_testcase {
         $this->expectOutputRegex("/Skipping $course->fullname \(Not visible\)/");
     }
 
+    /*
+     * Tests that courses with to many failed backuptries are skipped
+     */
+    public function test_should_skip_courses_with_too_many_failed_attempts() {
+
+        global $DB;
+
+        set_config('backup_auto_active', true, 'backup');
+        set_config('backup_auto_weekdays', '1111111', 'backup');
+        set_config('backup_auto_skip_too_many_fails', 3, 'backup');
+
+        // Create this backup course.
+        $backupcourse = new stdClass;
+        $backupcourse->courseid = $this->course->id;
+        $backupcourse->tries = 4;
+        // This is the status we believe last run was OK.
+        $backupcourse->laststatus = backup_cron_automated_helper::BACKUP_STATUS_SKIPPED;
+        $DB->insert_record('backup_courses', $backupcourse);
+        $backupcourse = $DB->get_record('backup_courses', array('courseid' => $this->course->id));
+
+        $classobject = $this->backupcronautomatedhelper->return_this();
+        $nextstarttime = backup_cron_automated_helper::calculate_next_automated_backup(null, time());
+
+        $method = new ReflectionMethod('\backup_cron_automated_helper', 'should_skip_course_backup');
+        $method->setAccessible(true); // Allow accessing of private method.
+        $skipped = $method->invokeArgs($classobject, [$backupcourse, $this->course, $nextstarttime]);
+
+        $this->assertTrue($skipped);
+        $this->expectOutputRegex("/Skipping {$this->course->fullname} \(Too many failed attempts\)/");
+    }
+
+    /*
+     * Tests that courses with to many failed backuptries are skipped
+     */
+    public function test_should_not_skip_courses_with_too_many_failed_attempts_if_config_is_set() {
+
+        global $DB;
+
+        set_config('backup_auto_active', true, 'backup');
+        set_config('backup_auto_week`days', '1111111', 'backup');
+        set_config('backup_auto_skip_too_many_fails', 0, 'backup');
+
+        // Create this backup course.
+        $backupcourse = new stdClass;
+        $backupcourse->courseid = $this->course->id;
+        $backupcourse->tries = 4;
+        // This is the status we believe last run was OK.
+        $backupcourse->laststatus = backup_cron_automated_helper::BACKUP_STATUS_SKIPPED;
+        $DB->insert_record('backup_courses', $backupcourse);
+        $backupcourse = $DB->get_record('backup_courses', array('courseid' => $this->course->id));
+
+        $classobject = $this->backupcronautomatedhelper->return_this();
+        $nextstarttime = backup_cron_automated_helper::calculate_next_automated_backup(null, time());
+
+        $method = new ReflectionMethod('\backup_cron_automated_helper', 'should_skip_course_backup');
+        $method->setAccessible(true); // Allow accessing of private method.
+        $skipped = $method->invokeArgs($classobject, [$backupcourse, $this->course, $nextstarttime]);
+
+        $this->assertFalse($skipped);
+    }
+
     /**
      * Tests the not modified course being skipped.
      */

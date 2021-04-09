@@ -82,6 +82,7 @@ class course_backup_task extends \core\task\adhoc_task {
             // Remove excess backups.
             $removedcount = \backup_cron_automated_helper::remove_excess_backups($course, time());
             $backupcourse->lastendtime = time();
+            $backupcourse->tries = 0;
             $backupcourse->nextstarttime = \backup_cron_automated_helper::calculate_next_automated_backup(null, time());
             $DB->update_record('backup_courses', $backupcourse);
         } catch (\moodle_exception $e) {

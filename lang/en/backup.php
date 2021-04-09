@@ -404,3 +404,5 @@ $string['userinfo'] = 'Userinfo';
 $string['module'] = 'Module';
 $string['morecoursesearchresults'] = 'More than {$a} courses found, showing first {$a} results';
 $string['recyclebin_desc'] = 'Note that these settings will be also be used for the recycle bin.';
+$string['skiptoomanyfails'] = 'Skip courses where backup fails more than';
+$string['skiptoomanyfailshelp'] = 'Choose to not run a backup again after a certain number of fails';
