@@ -38,7 +38,7 @@ $CFG = new stdClass();
 // will be stored.  This database must already have been created         //
 // and a username/password created to access it.                         //
 
-$CFG->dbtype    = 'pgsql';      // 'pgsql', 'mariadb', 'mysqli', 'sqlsrv' or 'oci'
+$CFG->dbtype    = 'pgsql';      // 'pgsql', 'mariadb', 'mysqli', 'auroramysql', 'sqlsrv' or 'oci'
 $CFG->dblibrary = 'native';     // 'native' only at the moment
 $CFG->dbhost    = 'localhost';  // eg 'localhost' or 'db.isp.com' or IP
 $CFG->dbname    = 'moodle';     // database name, eg moodle
@@ -874,7 +874,7 @@ $CFG->admin = 'admin';
 //           ),
 //           'extensions' => array(
 //               'Behat\MinkExtension' => array(
-//                   'selenium2' => array(
+//                   'webddriver' => array(
 //                       'browser' => 'firefox',
 //                       'capabilities' => array(
 //                           'platform' => 'OS X 10.6',
@@ -887,7 +887,7 @@ $CFG->admin = 'admin';
 //       'Mac-Safari' => array(
 //           'extensions' => array(
 //               'Behat\MinkExtension' => array(
-//                   'selenium2' => array(
+//                   'webddriver' => array(
 //                       'browser' => 'safari',
 //                       'capabilities' => array(
 //                           'platform' => 'OS X 10.8',
